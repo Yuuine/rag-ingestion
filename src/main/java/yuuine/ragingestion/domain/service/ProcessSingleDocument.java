@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import yuuine.ragingestion.domain.models.DocumentProcessingContext;
 import yuuine.ragingestion.dto.response.IngestResponse;
 import yuuine.ragingestion.exception.BusinessException;
 import yuuine.ragingestion.exception.ErrorCode;
@@ -19,10 +18,9 @@ public class ProcessSingleDocument {
 
     public IngestResponse processSingleDocument(MultipartFile file) {
 
-        DocumentProcessingContext context;
         //1. 解析文档基本信息
         try {
-            context = processDocument.processDocument(file);
+            processDocument.processDocument(file);
         } catch (BusinessException e) {
             return failResult(file.getOriginalFilename(), e.getMessage()); // 业务错误直接返回
         } catch (Exception e) {
@@ -30,10 +28,8 @@ public class ProcessSingleDocument {
         }
         //2. 解析文档内容为纯文本
         String plainText = documentParserService.parse(DocumentContextTL.get());
-
+        System.out.println(plainText);
         //3. 纯文本 chunk 处理
-
-        //4. 构建返回结果对象
 
         return null;
     }

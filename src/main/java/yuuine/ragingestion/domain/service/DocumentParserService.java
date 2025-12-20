@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import yuuine.ragingestion.domain.models.DocumentProcessingContext;
+import yuuine.ragingestion.domain.parser.DocumentParser;
 import yuuine.ragingestion.domain.parser.DocumentParserRegistry;
 
 /**
@@ -32,7 +33,7 @@ public class DocumentParserService {
         log.info("[FileParser] 开始路由解析器，文件类型: {}", mimeType);
 
         // 根据MIME类型查找对应的文档解析器
-        yuuine.ragingestion.domain.parser.DocumentParser parser = registry.getParser(mimeType);
+        DocumentParser parser = registry.getParser(mimeType);
 
         // 检查是否找到合适的解析器
         if (parser == null) {

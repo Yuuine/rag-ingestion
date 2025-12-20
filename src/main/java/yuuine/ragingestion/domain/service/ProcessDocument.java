@@ -10,7 +10,9 @@ import org.springframework.web.multipart.MultipartFile;
 import yuuine.ragingestion.domain.models.DocumentProcessingContext;
 import yuuine.ragingestion.exception.BusinessException;
 import yuuine.ragingestion.exception.ErrorCode;
+import yuuine.ragingestion.threadLocal.DocumentContextTL;
 import yuuine.ragingestion.utils.MD5Util;
+import yuuine.ragingestion.utils.MimeTypeDetectorUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -41,7 +43,7 @@ public class ProcessDocument {
         String md5 = md5Util.md5(fileBytes);
 
         //4. 解析文件元信息
-        String mimeType = detectMimeType(fileName, fileBytes);
+        String mimeType = MimeTypeDetectorUtil.detectMimeType(fileName, fileBytes);
 
         //5. 构建文件处理上下文对象
         DocumentProcessingContext context = new DocumentProcessingContext();
@@ -51,46 +53,11 @@ public class ProcessDocument {
         context.setFileBytes(fileBytes);
 
         //6. 将上下文对象context存入ThreadLocal里面
+        DocumentContextTL.set(context);
 
         //7. 返回文件处理上下文对象
         return context;
     }
-
-    private String detectMimeType(String fileName, byte[] fileBytes) {
-        // 使用 Tika 的 AutoDetectParser
-        Detector detector = new DefaultDetector();
-        Metadata metadata = new Metadata();
-        try (InputStream inputStream = new ByteArrayInputStream(fileBytes)) {
-            MediaType mediaType = detector.detect(inputStream, metadata);
-            String mimeType = mediaType.toString();
-
-            // 处理 MIME 类型为空的情况
-            if (mimeType == null || mimeType.trim().isEmpty()) {
-                mimeType = "application/octet-stream";
-            }
-            return mimeType;
-            // 针对text/plain类型的特殊处理
-            if ("text/plain".equals(mimeType)) {
-                mimeType = textTypeDetect(fileName);
-            }
-        } catch (IOException e) {
-            throw new BusinessException(ErrorCode.FILE_IO_PROCESS_ERROR, e);
-        }
-    }
-
-    private String textTypeDetect(String filename) {
-
-        if (filename.endsWith(".md")) {
-            return "text/markdown";
-        }
-
-        if (filename.endsWith(".json")) {
-            return "application/json";
-        }
-
-        return "text/plain"; // 默认仍然是文本
-    }
-
 
     private void validateFile(MultipartFile file) {
 
