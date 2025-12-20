@@ -1,0 +1,29 @@
+package yuuine.ragingestion.exception;
+
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import yuuine.ragingestion.common.Result;
+
+@Slf4j
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<Result<Object>> handleBizException(BusinessException e, HttpServletRequest request) {
+        log.warn("business exception: URL={}, method={}, code={}",
+                request.getRequestURI(),
+                request.getMethod(),
+                e.getCode(),
+                e);
+
+        Result<Object> result = Result.error(Integer.parseInt(e.getCode()), e.getMessage());
+
+        return ResponseEntity.badRequest().body(result);
+
+    }
+
+}
+
