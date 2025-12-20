@@ -8,12 +8,14 @@ import yuuine.ragingestion.domain.models.DocumentProcessingContext;
 import yuuine.ragingestion.dto.response.IngestResponse;
 import yuuine.ragingestion.exception.BusinessException;
 import yuuine.ragingestion.exception.ErrorCode;
+import yuuine.ragingestion.threadLocal.DocumentContextTL;
 
 @RequiredArgsConstructor
 @Service
 public class ProcessSingleDocument {
 
     private final ProcessDocument processDocument;
+    private final DocumentParserService documentParserService;
 
     public IngestResponse processSingleDocument(MultipartFile file) {
 
@@ -27,7 +29,7 @@ public class ProcessSingleDocument {
             throw new BusinessException(ErrorCode.FILE_UPLOAD_FAILED, e); // 系统异常继续抛
         }
         //2. 解析文档内容为纯文本
-        String plainText = documentParser.parse();
+        String plainText = documentParserService.parse(DocumentContextTL.get());
 
         //3. 纯文本 chunk 处理
 

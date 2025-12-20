@@ -34,7 +34,7 @@ public class ProcessDocument {
         try {
             fileBytes = file.getBytes();
         } catch (IOException e) {
-            throw new BusinessException(ErrorCode.FILE_PROCESS_ERROR, e);
+            throw new BusinessException(ErrorCode.FILE_GET_BYTES_ERROR, e);
         }
 
         //3.计算文件的MD5值，作为文件唯一标识
@@ -74,7 +74,7 @@ public class ProcessDocument {
                 mimeType = textTypeDetect(fileName);
             }
         } catch (IOException e) {
-            throw new BusinessException(ErrorCode.FILE_PROCESS_ERROR, e);
+            throw new BusinessException(ErrorCode.FILE_IO_PROCESS_ERROR, e);
         }
     }
 
