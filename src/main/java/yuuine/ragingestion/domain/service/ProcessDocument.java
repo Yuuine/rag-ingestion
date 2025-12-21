@@ -1,28 +1,19 @@
 package yuuine.ragingestion.domain.service;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.tika.detect.DefaultDetector;
-import org.apache.tika.detect.Detector;
-import org.apache.tika.metadata.Metadata;
-import org.apache.tika.mime.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import yuuine.ragingestion.domain.models.DocumentProcessingContext;
 import yuuine.ragingestion.exception.BusinessException;
 import yuuine.ragingestion.exception.ErrorCode;
-import yuuine.ragingestion.threadLocal.DocumentContextTL;
-import yuuine.ragingestion.utils.MD5Util;
+import yuuine.ragingestion.utils.Md5Util;
 import yuuine.ragingestion.utils.MimeTypeDetectorUtil;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 @RequiredArgsConstructor
 @Service
 public class ProcessDocument {
-
-    private final MD5Util md5Util;
 
     public DocumentProcessingContext processDocument(MultipartFile file) {
 
@@ -40,7 +31,7 @@ public class ProcessDocument {
         }
 
         //3.计算文件的MD5值，作为文件唯一标识
-        String md5 = md5Util.md5(fileBytes);
+        String md5 = Md5Util.computeMd5(fileBytes);
 
         //4. 解析文件元信息
         String mimeType = MimeTypeDetectorUtil.detectMimeType(fileName, fileBytes);
@@ -52,10 +43,7 @@ public class ProcessDocument {
         context.setMimeType(mimeType);
         context.setFileBytes(fileBytes);
 
-        //6. 将上下文对象context存入ThreadLocal里面
-        DocumentContextTL.set(context);
-
-        //7. 返回文件处理上下文对象
+        //6. 返回文件处理上下文对象
         return context;
     }
 

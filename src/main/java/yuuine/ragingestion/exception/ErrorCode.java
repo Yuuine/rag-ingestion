@@ -13,6 +13,7 @@ public enum ErrorCode {
     FILE_GET_BYTES_ERROR(1004, "获取文件字节错误"),
     FILE_IO_PROCESS_ERROR(1005, "文件IO处理错误"),
     FILE_UPLOAD_FAILED(1006, "文件上传失败"),
+    UNSUPPORTED_FILE_TYPE(1007, "不支持的文件类型"),
     ;
 
     private final int code;

@@ -8,17 +8,21 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 @Slf4j
-@Component
-public class MD5Util {
+public class Md5Util {
 
-    public String md5(byte[] fileBytes) {
+    public static String computeMd5(byte[] fileBytes) {
         InputStream inputStream = new ByteArrayInputStream(fileBytes);
-        String md5;
+        return computeMd5(inputStream);
+    }
+
+
+    public static String computeMd5(InputStream inputStream) {
+        String computeMd5;
         try {
-            md5 = DigestUtils.md5DigestAsHex(inputStream);
+            computeMd5 = DigestUtils.md5DigestAsHex(inputStream);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        return md5;
+        return computeMd5;
     }
 }

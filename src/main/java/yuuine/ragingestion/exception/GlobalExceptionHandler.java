@@ -16,10 +16,10 @@ public class GlobalExceptionHandler {
         log.warn("business exception: URL={}, method={}, code={}",
                 request.getRequestURI(),
                 request.getMethod(),
-                e.getCode(),
+                e.getErrorCode().getCode(),
                 e);
 
-        Result<Object> result = Result.error(Integer.parseInt(e.getCode()), e.getMessage());
+        Result<Object> result = Result.error(e.getErrorCode().getCode(), e.getMessage());
 
         return ResponseEntity.badRequest().body(result);
 

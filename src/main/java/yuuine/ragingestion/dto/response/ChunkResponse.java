@@ -1,8 +1,12 @@
 package yuuine.ragingestion.dto.response;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class ChunkResponse {
 
     private String source;          // 原始文件名（如 "小王子.pdf"）
@@ -11,5 +15,4 @@ public class ChunkResponse {
     private Integer chunkIndex;     // 从 0 开始
     private String chunkText;       // 非空文本
     private Integer charCount;       // UTF-8 字符数
-
 }

@@ -2,8 +2,8 @@ package yuuine.ragingestion.domain.parser.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.metadata.Metadata;
-import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
+import org.apache.tika.parser.pdf.PDFParser;
 import org.apache.tika.parser.pdf.PDFParserConfig;
 import org.apache.tika.sax.BodyContentHandler;
 import org.springframework.stereotype.Component;
@@ -18,26 +18,22 @@ import java.util.List;
 /**
  * PDF 文档解析器
  */
-//TODO: 待优化，类型检测，分类处理，ocr识别
 @Slf4j
 @Component
 public class PdfParser implements DocumentParser {
 
     @Override
     public List<String> supportedMimeTypes() {
-
         return List.of("application/pdf");
     }
 
     @Override
     public String parse(DocumentProcessingContext context) {
         byte[] fileBytes = context.getFileBytes();
-
         String fileName = context.getFileName();
         log.info("[PDFParser] 开始解析 PDF: name={}, size={}字节", fileName, fileBytes.length);
 
         try (ByteArrayInputStream is = new ByteArrayInputStream(fileBytes)) {
-
             BodyContentHandler handler = new BodyContentHandler(-1); // 不限制长度
             Metadata metadata = new Metadata();
             ParseContext newContext = new ParseContext();
@@ -47,10 +43,10 @@ public class PdfParser implements DocumentParser {
             config.setSortByPosition(true);
             newContext.set(PDFParserConfig.class, config);
 
-            new AutoDetectParser().parse(is, handler, metadata, newContext);
+            // 使用专用 PDFParser
+            new PDFParser().parse(is, handler, metadata, newContext);
 
             String text = handler.toString().trim();
-
             log.info("[PDFParser] PDF 解析完成，文本长度 {} 字符", text.length());
 
             return text;

@@ -3,30 +3,53 @@ package yuuine.ragingestion.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import yuuine.ragingestion.application.assembler.ChunkAssembler;
+import yuuine.ragingestion.domain.models.SingleFileProcessResult;
 import yuuine.ragingestion.domain.service.ProcessSingleDocument;
-import yuuine.ragingestion.dto.response.IngestResponse;
+import yuuine.ragingestion.dto.response.*;
 import yuuine.ragingestion.service.DocumentIngestionService;
 
+import java.util.ArrayList;
 import java.util.List;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class DocumentIngestionServiceImpl implements DocumentIngestionService {
 
     private final ProcessSingleDocument processSingleDocument;
+    private final ChunkAssembler chunkAssembler;
 
     @Override
     public IngestResponse ingest(List<MultipartFile> files) {
 
-        //构建返回结果
-        IngestResponse ingestResponse = new IngestResponse();
+        List<ChunkResponse> allChunks = new ArrayList<>();
+        List<String> successFiles = new ArrayList<>();
+        List<String> failedFiles = new ArrayList<>();
 
-        //遍历上传文件并逐个处理
         for (MultipartFile file : files) {
-            //处理单个文件
-            IngestResponse chunkResponse = processSingleDocument.processSingleDocument(file);
+
+            SingleFileProcessResult result = processSingleDocument.processSingleDocument(file);
+
+            if (result.isSuccess()) {
+                successFiles.add(result.getFilename());
+                allChunks.addAll(chunkAssembler.toResponses(result));
+            } else {
+                failedFiles.add(result.getFilename());
+            }
         }
 
-        return null;
+        FileResult fileResult = new FileResult();
+        fileResult.setSuccessfulFiles(successFiles);
+        fileResult.setFailedFiles(failedFiles);
+
+        IngestSummary summary = new IngestSummary();
+        summary.setTotalFiles(files.size());
+        summary.setFileResult(fileResult);
+
+        IngestResponse response = new IngestResponse();
+        response.setChunks(allChunks);
+        response.setSummary(summary);
+
+        return response;
     }
 }

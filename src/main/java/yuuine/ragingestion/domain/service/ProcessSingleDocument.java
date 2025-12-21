@@ -1,42 +1,57 @@
 package yuuine.ragingestion.domain.service;
 
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.Nullable;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import yuuine.ragingestion.dto.response.IngestResponse;
-import yuuine.ragingestion.exception.BusinessException;
-import yuuine.ragingestion.exception.ErrorCode;
-import yuuine.ragingestion.threadLocal.DocumentContextTL;
+import yuuine.ragingestion.domain.chunk.Chunk;
+import yuuine.ragingestion.domain.chunk.ChunkService;
+import yuuine.ragingestion.domain.models.DocumentProcessingContext;
+import yuuine.ragingestion.domain.models.SingleFileProcessResult;
 
-@RequiredArgsConstructor
+import java.util.List;
+
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class ProcessSingleDocument {
 
     private final ProcessDocument processDocument;
     private final DocumentParserService documentParserService;
+    private final ChunkService chunkService;
 
-    public IngestResponse processSingleDocument(MultipartFile file) {
+    public SingleFileProcessResult processSingleDocument(MultipartFile file) {
 
-        //1. 解析文档基本信息
+        String filename = file.getOriginalFilename();
+
         try {
-            processDocument.processDocument(file);
-        } catch (BusinessException e) {
-            return failResult(file.getOriginalFilename(), e.getMessage()); // 业务错误直接返回
+            // 1. 构建上下文（MD5 / MIME）
+            DocumentProcessingContext context = processDocument.processDocument(file);
+
+            // 2. 解析为纯文本
+            String plainText = documentParserService.parse(context);
+            if (plainText == null || plainText.isBlank()) {
+                log.warn("Parsed text is empty: {}", filename);
+            }
+
+            // 3. Chunk
+            List<Chunk> chunks = chunkService.getChunks(plainText);
+            if (chunks.isEmpty()) {
+                log.warn("No chunks generated: {}", filename);
+            }
+
+            return SingleFileProcessResult.success(
+                    filename,
+                    context.getFileMd5(),
+                    chunks
+            );
+
         } catch (Exception e) {
-            throw new BusinessException(ErrorCode.FILE_UPLOAD_FAILED, e); // 系统异常继续抛
+            log.error("Process file failed: {}", filename, e);
+            return SingleFileProcessResult.failure(
+                    filename,
+                    e.getMessage()
+            );
         }
-        //2. 解析文档内容为纯文本
-        String plainText = documentParserService.parse(DocumentContextTL.get());
-        System.out.println(plainText);
-        //3. 纯文本 chunk 处理
-
-        return null;
     }
-
-    private IngestResponse failResult(@Nullable String originalFilename, String message) {
-        return null;
-    }
-
-
 }
