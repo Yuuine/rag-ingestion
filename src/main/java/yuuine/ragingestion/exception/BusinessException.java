@@ -15,7 +15,7 @@ public class BusinessException extends RuntimeException {
         this.details = null;
     }
 
-    // 2. 带详细信息（推荐用于业务场景）
+    // 2. 带详细信息 ErrorCode + 详细信息
     public BusinessException(ErrorCode errorCode, String details) {
         super(errorCode.getMessage() + (details != null ? ": " + details : ""));
         this.errorCode = errorCode;
@@ -29,7 +29,7 @@ public class BusinessException extends RuntimeException {
         this.details = null;
     }
 
-    // 4. 带详细信息 + 异常原因（最完整）
+    // 4. 详细信息 + 异常原因
     public BusinessException(ErrorCode errorCode, String details, Throwable cause) {
         super(errorCode.getMessage() + (details != null ? ": " + details : ""), cause);
         this.errorCode = errorCode;
