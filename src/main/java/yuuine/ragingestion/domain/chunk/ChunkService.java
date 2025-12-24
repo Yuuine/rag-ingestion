@@ -3,7 +3,7 @@ package yuuine.ragingestion.domain.chunk;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import yuuine.ragingestion.domain.chunk.impl.SlidingWindowTextChunker;
+import yuuine.ragingestion.domain.chunk.impl.LangChain4jRecursiveTextChunker;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ChunkService {
 
-    private final SlidingWindowTextChunker slidingWindowTextChunker;
+    private final LangChain4jRecursiveTextChunker langChain4jRecursiveTextChunker;
 
     /**
      * 对给定文本进行分块处理。
@@ -29,7 +29,7 @@ public class ChunkService {
     public List<Chunk> getChunks(String text) {
         List<Chunk> chunks = new ArrayList<>();
         // 调用分块器，将每个产出的chunk收集到列表中
-        slidingWindowTextChunker.chunkStream(text, chunks::add);
+        langChain4jRecursiveTextChunker.chunkStream(text, chunks::add);
         log.info("[ChunkService] Generated {} chunks from text.", chunks.size());
         return chunks;
     }

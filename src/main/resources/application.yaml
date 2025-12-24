@@ -4,7 +4,13 @@ server:
 spring:
   application:
     name: rag-ingestion
+
   servlet:
     multipart:
       max-file-size: 100MB
       max-request-size: 100MB
+
+app:
+  text-chunker:
+    chunk-size: 512
+    overlap: 100

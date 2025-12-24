@@ -9,6 +9,7 @@ import yuuine.ragingestion.utils.UUIDUtil; // 假设你有此工具类
 import java.util.function.Consumer;
 
 /**
+ * !!!注意： 手动实现分块效果非常之差，该实现类已废弃。
  * 滑动窗口文本分块器实现。
  */
 @Slf4j
