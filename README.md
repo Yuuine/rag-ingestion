@@ -6,55 +6,20 @@ RAG Ingestion Service 是一个文档处理和嵌入生成服务，用于将各�
 
 - 支持多种文档格式解析（PDF、TXT、Markdown、DOCX等）
 - 智能文本分块处理(多种分块策略)
+- 基于LangChain4j的递归文本分块器
 - 返回结构化 Chunk 列表（JSON）
 
-## API接口
+## 配置
 
-### 输入 POST /ingest
-
-```http
-POST /ingest
-Content-Type: multipart/form-data
-
-@RequestParam("files") List<MultipartFile>
+```yaml
+chunker:
+  chunk-size: 500   # 每个文本块的最大字符数 
+  overlap: 50       # 相邻文本块之间的重叠字符数
 ```
 
-### 响应
+## 接口文档
 
-示例：
-```json
-{
-  "code": 0,
-  "message": "success",
-  "data": {
-    "chunks": [
-      {
-        "source": "小王子.pdf",
-        "fileMd5": "cee977041098e8ec37160e49ec6ffe7c",
-        "chunkId": "010301cb37f64b19bf5cee93cea00b81",
-        "chunkIndex": 0,
-        "chunkText": "小王子的星球是哪颗？... far away",
-        "charCount": 275
-      },
-      {
-        "source": "小公主.pdf",
-        "fileMd5": "a1b2c3d4d5f25s8f88sd8f8ed4f5d4fd",
-        "chunkId": "0b39cbaa6cb94c839972aefc9a6099ae",
-        "chunkIndex": 1,
-        "chunkText": "that they need...我的第一号作品。",
-        "charCount": 292
-      }
-    ],
-    "summary": {
-      "totalFiles": 3,
-        "fileResult": {
-          "successfulFiles": ["小王子.pdf", "小公主.pdf"],
-          "failedFiles": ["百年孤独.pdf"]
-      }
-    }
-  }
-}
-```
+完整 API 说明请参阅：[API 文档](./docs/api.md)
 
 ## 致谢
 
